@@ -22,7 +22,7 @@ function varargout = Main_window(varargin)
 
 % Edit the above text to modify the response to help Main_window
 
-% Last Modified by GUIDE v2.5 19-Nov-2023 22:53:28
+% Last Modified by GUIDE v2.5 17-Apr-2024 22:37:15
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -95,13 +95,6 @@ function pushbutton_hide_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 Figure_hide();
 
-% --- Executes on button press in pushbutton_about.
-function pushbutton_about_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton_about (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-helpdlg(['作者：fkby48',char(10),'作者邮箱：y970310@126.com',char(10),'软件版本：V1.0',char(10),...
-    '软件简介：使用小波变换对图像进行各种处理。感谢您的使用！'],'关于');
 
 % --- Executes on button press in pushbutton_exit.
 function pushbutton_exit_Callback(hObject, eventdata, handles)
@@ -117,3 +110,20 @@ function pushbutton_compress_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 Figure_compress();
+
+
+% --------------------------------------------------------------------
+function menu_about_Callback(hObject, eventdata, handles)
+% hObject    handle to menu_about (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+helpdlg(['作者：fkby48',char(10),'作者邮箱：y970310@126.com',char(10),'软件版本：V1.1',char(10),...
+    '软件简介：使用小波变换对图像进行各种处理。感谢您的使用！'],'关于');
+
+
+% --- Executes on button press in pushbutton_preprocess.
+function pushbutton_preprocess_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton_preprocess (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+Figure_preprocess();
