@@ -8,3 +8,11 @@ English:
 The program is developed based on MATLAB R2018b and has a GUI interface. It uses wavelet transform to process images, including image fusion, image denoising, image compression, and image hiding.
 The program provides testing materials, and users can create other image materials based on the content of the materials.
 Currently, the program is not perfect and needs further improvement. Thank you for your attention!
+
+更新日志：
+V1.1（2024.4.18）
+1. 对计算PSNR和NC出现错误时的提示进行了改进
+2. 新增图像预处理功能，可以对图像进行灰度转换和高斯加噪
+未来更新计划：增加更多的异常处理机制
+V1.0（2023.11.22）
+第一个版本
