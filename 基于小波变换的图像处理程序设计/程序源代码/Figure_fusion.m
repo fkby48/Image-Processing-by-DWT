@@ -86,18 +86,26 @@ function pushbutton_figure1_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton_figure1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-[filename,pathname]=uigetfile({'*.png';'*.jpg';'*.bmp'},'读取图像');
-if(isequal(filename,0) || isequal(pathname,0))
-    % do nothing
-else
-    percentage=0;h_waitbar=waitbar(percentage,'读取中......0%','name','请稍候'); 
-    handles.figure1=imread([pathname,filename]);
-    percentage=0.5;waitbar(percentage,h_waitbar,['读取中......',num2str(percentage*100),'%']);
-    axes(handles.axes_figure1);
-    imshow(handles.figure1);
-    title('融合图像1');
-    percentage=1;waitbar(percentage,h_waitbar,['读取中......',num2str(percentage*100),'%']);
-    close(h_waitbar);
+% 读取图像1按钮
+try
+    [filename,pathname]=uigetfile({'*.png';'*.jpg';'*.bmp'},'读取图像');
+    if(isequal(filename,0) || isequal(pathname,0))
+        % do nothing
+    else
+        percentage=0;h_waitbar=waitbar(percentage,'读取中......0%','name','请稍候'); 
+        handles.figure1=imread([pathname,filename]);
+        percentage=0.5;waitbar(percentage,h_waitbar,['读取中......',num2str(percentage*100),'%']);
+        axes(handles.axes_figure1);
+        imshow(handles.figure1);
+        title('融合图像1');
+        percentage=1;waitbar(percentage,h_waitbar,['读取中......',num2str(percentage*100),'%']);
+        close(h_waitbar);
+    end
+catch ex
+    if(exist('h_waitbar','var'))
+        close(h_waitbar);
+    end
+    errordlg(['请检查错误信息，然后重试。',char(10),'错误信息：',ex.message],'读取图像出错');
 end
 guidata(hObject, handles);
 
@@ -106,18 +114,26 @@ function pushbutton_figure2_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton_figure2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-[filename,pathname]=uigetfile({'*.png';'*.jpg';'*.bmp'},'读取图像');
-if(isequal(filename,0) || isequal(pathname,0))
-    % do nothing
-else
-    percentage=0;h_waitbar=waitbar(percentage,'读取中......0%','name','请稍候'); 
-    handles.figure2=imread([pathname,filename]);
-    percentage=0.5;waitbar(percentage,h_waitbar,['读取中......',num2str(percentage*100),'%']);
-    axes(handles.axes_figure2);
-    imshow(handles.figure2);
-    title('融合图像2');
-    percentage=1;waitbar(percentage,h_waitbar,['读取中......',num2str(percentage*100),'%']);
-    close(h_waitbar);
+% 读取图像2按钮
+try
+    [filename,pathname]=uigetfile({'*.png';'*.jpg';'*.bmp'},'读取图像');
+    if(isequal(filename,0) || isequal(pathname,0))
+        % do nothing
+    else
+        percentage=0;h_waitbar=waitbar(percentage,'读取中......0%','name','请稍候'); 
+        handles.figure2=imread([pathname,filename]);
+        percentage=0.5;waitbar(percentage,h_waitbar,['读取中......',num2str(percentage*100),'%']);
+        axes(handles.axes_figure2);
+        imshow(handles.figure2);
+        title('融合图像2');
+        percentage=1;waitbar(percentage,h_waitbar,['读取中......',num2str(percentage*100),'%']);
+        close(h_waitbar);
+    end
+catch ex
+    if(exist('h_waitbar','var'))
+        close(h_waitbar);
+    end
+    errordlg(['请检查错误信息，然后重试。',char(10),'错误信息：',ex.message],'读取图像出错');
 end
 guidata(hObject, handles);
 
@@ -126,43 +142,68 @@ function pushbutton_fusion_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton_fusion (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% 图像融合部分
-handles.wavetype=get(handles.popupmenu_wavetype,'value');
-handles.n=str2double(get(handles.edit_n,'string'));
-handles.weight1=str2double(get(handles.edit_weight1,'string'));
-handles.weight2=str2double(get(handles.edit_weight2,'string'));
-percentage=0;h_waitbar=waitbar(percentage,'计算中......0%','name','请稍候'); 
-image1=double(handles.figure1)/256;
-image2=double(handles.figure2)/256;
-percentage=0.25;waitbar(percentage,h_waitbar,['计算中......',num2str(percentage*100),'%']);
-switch handles.wavetype
-    case 1
-        [c1,s1]=wavedec2(image1,handles.n,'haar');
-        [c2,s2]=wavedec2(image2,handles.n,'haar');
-    case 2
-        [c1,s1]=wavedec2(image1,handles.n,'db4');
-        [c2,s2]=wavedec2(image2,handles.n,'db4');
-    case 3
-        [c1,s1]=wavedec2(image1,handles.n,'sym4');
-        [c2,s2]=wavedec2(image2,handles.n,'sym4');
+% 图像融合按钮（核心代码）
+try
+    if(numel(size(handles.figure1))~=numel(size(handles.figure2))) %判断两图是否均为彩图/灰度
+        warndlg('图像颜色类型不一致，无法融合。','提示');
+        guidata(hObject,handles);
+        return;
+    elseif(size(handles.figure1,1)~=size(handles.figure2,1)) %判断两图大小是否一致（维度1）
+        warndlg('图像大小不一致，无法融合。','提示');
+        guidata(hObject,handles);
+        return;
+    elseif(size(handles.figure1,2)~=size(handles.figure2,2)) %判断两图大小是否一致（维度2）
+        warndlg('图像大小不一致，无法融合。','提示');
+        guidata(hObject,handles);
+        return;
+    end
+    handles.weight1=str2double(get(handles.edit_weight1,'string'));
+    handles.weight2=str2double(get(handles.edit_weight2,'string'));
+    if(handles.weight1+handles.weight2>1) %检查融合系数之和是否大于1
+        warndlg('融合系数之和大于1，无法融合。','提示');
+        guidata(hObject,handles);
+        return;
+    end
+    handles.wavetype=get(handles.popupmenu_wavetype,'value');
+    handles.n=str2double(get(handles.edit_n,'string'));
+    percentage=0;h_waitbar=waitbar(percentage,'处理中......0%','name','请稍候'); 
+    fusion_img1=double(handles.figure1)/255;
+    fusion_img2=double(handles.figure2)/255;
+    percentage=0.25;waitbar(percentage,h_waitbar,['处理中......',num2str(percentage*100),'%']);
+    switch handles.wavetype %进行小波变换，获取分解系数
+        case 1
+            [c1,s1]=wavedec2(fusion_img1,handles.n,'haar');
+            [c2,s2]=wavedec2(fusion_img2,handles.n,'haar');
+        case 2
+            [c1,s1]=wavedec2(fusion_img1,handles.n,'db4');
+            [c2,s2]=wavedec2(fusion_img2,handles.n,'db4');
+        case 3
+            [c1,s1]=wavedec2(fusion_img1,handles.n,'sym4');
+            [c2,s2]=wavedec2(fusion_img2,handles.n,'sym4');
+    end
+    percentage=0.5;waitbar(percentage,h_waitbar,['处理中......',num2str(percentage*100),'%']);
+    c=handles.weight1*c1+handles.weight2*c2; %按设定的权重对分解系数进行叠加
+    s=round(handles.weight1*s1+handles.weight2*s2);
+    percentage=0.75;waitbar(percentage,h_waitbar,['处理中......',num2str(percentage*100),'%']);
+    switch handles.wavetype %图像重构
+        case 1
+            handles.fusion=waverec2(c,s,'haar');
+        case 2
+            handles.fusion=waverec2(c,s,'db4');
+        case 3
+            handles.fusion=waverec2(c,s,'sym4');
+    end
+    axes(handles.axes_fusion);
+    imshow(handles.fusion,[]);
+    title('融合结果');
+    percentage=1;waitbar(percentage,h_waitbar,['处理中......',num2str(percentage*100),'%']);
+    close(h_waitbar);
+catch ex
+    if(exist('h_waitbar','var'))
+        close(h_waitbar);
+    end
+    errordlg(['请检查错误信息，然后重试。',char(10),'错误信息：',ex.message],'处理图像出错');
 end
-percentage=0.5;waitbar(percentage,h_waitbar,['计算中......',num2str(percentage*100),'%']);
-c=handles.weight1*c1+handles.weight2*c2;
-s=round(handles.weight1*s1+handles.weight2*s2);
-percentage=0.75;waitbar(percentage,h_waitbar,['计算中......',num2str(percentage*100),'%']);
-switch handles.wavetype
-    case 1
-        handles.fusion=waverec2(c,s,'haar');
-    case 2
-        handles.fusion=waverec2(c,s,'db4');
-    case 3
-        handles.fusion=waverec2(c,s,'sym4');
-end
-axes(handles.axes_fusion);
-imshow(handles.fusion,[]);
-title('融合结果');
-percentage=1;waitbar(percentage,h_waitbar,['计算中......',num2str(percentage*100),'%']);
-close(h_waitbar);
 guidata(hObject,handles);
 
 % --- Executes on button press in pushbutton_compare.
@@ -170,18 +211,26 @@ function pushbutton_compare_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton_compare (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-[filename,pathname]=uigetfile({'*.png';'*.jpg';'*.bmp'},'读取图像');
-if(isequal(filename,0) || isequal(pathname,0))
-    % do nothing
-else
-    percentage=0;h_waitbar=waitbar(percentage,'读取中......0%','name','请稍候'); 
-    handles.compare=imread([pathname,filename]);
-    percentage=0.5;waitbar(percentage,h_waitbar,['读取中......',num2str(percentage*100),'%']);
-    axes(handles.axes_compare);
-    imshow(handles.compare);
-    title('理想结果对比');
-    percentage=1;waitbar(percentage,h_waitbar,['读取中......',num2str(percentage*100),'%']);
-    close(h_waitbar);
+% 读取对比图像按钮
+try
+    [filename,pathname]=uigetfile({'*.png';'*.jpg';'*.bmp'},'读取图像');
+    if(isequal(filename,0) || isequal(pathname,0))
+        % do nothing
+    else
+        percentage=0;h_waitbar=waitbar(percentage,'读取中......0%','name','请稍候'); 
+        handles.compare=imread([pathname,filename]);
+        percentage=0.5;waitbar(percentage,h_waitbar,['读取中......',num2str(percentage*100),'%']);
+        axes(handles.axes_compare);
+        imshow(handles.compare);
+        title('理想结果对比');
+        percentage=1;waitbar(percentage,h_waitbar,['读取中......',num2str(percentage*100),'%']);
+        close(h_waitbar);
+    end
+catch ex
+    if(exist('h_waitbar','var'))
+        close(h_waitbar);
+    end
+    errordlg(['请检查错误信息，然后重试。',char(10),'错误信息：',ex.message],'读取图像出错');
 end
 guidata(hObject, handles);
 
@@ -190,14 +239,22 @@ function pushbutton_save_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton_save (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-[filename,pathname]=uiputfile({'*.png';'*.jpg';'*.bmp'},'保存图像','saved_figure.png');
-if isequal(filename,0) || isequal(pathname,0)
-    % do nothing
-else
-    percentage=0;h_waitbar=waitbar(percentage,'保存中......0%','name','请稍候');
-    imwrite(mat2gray(handles.fusion),[pathname,filename]);  
-    percentage=1;waitbar(percentage,h_waitbar,['保存中......',num2str(percentage*100),'%']);
-    close(h_waitbar);
+% 保存图像按钮
+try
+    [filename,pathname]=uiputfile({'*.png';'*.jpg';'*.bmp'},'保存图像','saved_figure.png');
+    if isequal(filename,0) || isequal(pathname,0)
+        % do nothing
+    else
+        percentage=0;h_waitbar=waitbar(percentage,'保存中......0%','name','请稍候');
+        imwrite(mat2gray(handles.fusion),[pathname,filename]);
+        percentage=1;waitbar(percentage,h_waitbar,['保存中......',num2str(percentage*100),'%']);
+        close(h_waitbar);
+    end
+catch ex
+    if(exist('h_waitbar','var'))
+        close(h_waitbar);
+    end
+    errordlg(['请检查错误信息，然后重试。',char(10),'错误信息：',ex.message],'保存图像出错');
 end
 guidata(hObject, handles);
 

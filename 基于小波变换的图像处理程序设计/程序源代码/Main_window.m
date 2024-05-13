@@ -22,7 +22,7 @@ function varargout = Main_window(varargin)
 
 % Edit the above text to modify the response to help Main_window
 
-% Last Modified by GUIDE v2.5 17-Apr-2024 22:37:15
+% Last Modified by GUIDE v2.5 13-May-2024 21:17:39
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -117,7 +117,7 @@ function menu_about_Callback(hObject, eventdata, handles)
 % hObject    handle to menu_about (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-helpdlg(['作者：fkby48',char(10),'作者邮箱：y970310@126.com',char(10),'软件版本：V1.1',char(10),...
+helpdlg(['作者：fkby48',char(10),'作者邮箱：y970310@126.com',char(10),'软件版本：V1.2',char(10),...
     '软件简介：使用小波变换对图像进行各种处理。感谢您的使用！'],'关于');
 
 

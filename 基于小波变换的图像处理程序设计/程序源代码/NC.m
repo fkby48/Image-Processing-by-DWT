@@ -1,3 +1,4 @@
+%用于图像隐藏。计算NC（归一化相关系数），越接近1表示与原图越像
 function dNC = NC(ImageA,ImageB)
 if (size(ImageA,1) ~= size(ImageB,1)) || (size(ImageA,2) ~= size(ImageB,2))
     dNC = 0;

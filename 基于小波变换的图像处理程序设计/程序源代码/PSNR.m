@@ -1,3 +1,4 @@
+%用于图像隐藏。计算PSNR（峰值信噪比），值越大表示越接近原图
 function dPSNR = PSNR(ImageA,ImageB)
 if (size(ImageA,1) ~= size(ImageB,1)) || (size(ImageA,2) ~= size(ImageB,2))
     dPSNR=0;
